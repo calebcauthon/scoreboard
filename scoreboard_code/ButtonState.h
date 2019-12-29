@@ -22,7 +22,6 @@ class ButtonState {
     bool tick() {
       bool isButtonPressed = getState() == HIGH ? true : false;
 
-      Serial.println(timeSinceLastChange());
       if (!wasButtonPressed && isButtonPressed && timeSinceLastChange() > threshold) {
         onPressHandler();
         timeOfLastChange = millis();

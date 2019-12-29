@@ -45,7 +45,7 @@ void decreaseLeftScore() {
 }
 
 void increaseRightScore() {
-  game.increaseLeft();
+  game.increaseRight();
   displayCurrentScore();
 }
 
@@ -83,6 +83,10 @@ void loop()
   rightDownButton.tick();
 }
 
+void onGameOver() {
+  Serial.print("Game over!");
+}
+
 void setup()
 {
   mx.begin();
@@ -90,4 +94,6 @@ void setup()
   char scoreMessage[BUF_SIZE] = "0-0";
   printText(0, MAX_DEVICES-1, scoreMessage);
   Serial.begin(9600);
+
+  game.onGameOver(onGameOver);
 }

@@ -2,20 +2,71 @@ class GoaltyGame {
 public:
   int leftScore = 0;
   int rightScore = 0;
+  int minimumScore = 0;
+
+  void (*onGameOverHandler)(void);
+  void onGameOver(void (*f)()) {
+    onGameOverHandler = f;
+  }
+
+  bool isGameOver() {
+    int higherScore = leftScore > rightScore ? leftScore : rightScore;
+    int lowerScore  = leftScore > rightScore ? rightScore : leftScore;
+
+    if (higherScore >= 5 && lowerScore <= (higherScore - 2)) {
+      return true;
+    } else if (higherScore == 7) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void changeLeft(int amount) {
+    if (isGameOver()) {
+      return;
+    }
+
+    if ((leftScore + amount) < minimumScore) {
+      return;
+    }
+
+    leftScore += amount;
+
+    if (isGameOver()) {
+      onGameOverHandler();
+    }
+  }
+
+  void changeRight(int amount) {
+    if (isGameOver()) {
+      return;
+    }
+
+    if ((rightScore + amount) < minimumScore) {
+      return;
+    }
+
+    rightScore += amount;
+
+    if (isGameOver()) {
+      onGameOverHandler();
+    }
+  }
 
   void increaseLeft() {
-    leftScore++;
+    changeLeft(1);
   }
 
   void increaseRight() {
-    rightScore++;
+    changeRight(1);
   }
 
   void decreaseLeft() {
-    leftScore--;
+    changeLeft(-1);
   }
 
   void decreaseRight() {
-    rightScore--;
+    changeRight(-1);
   }
 };
