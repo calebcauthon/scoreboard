@@ -5,13 +5,21 @@ class ButtonState {
     bool wasButtonPressed = false;
     void (*onPressHandler)(void);
 
-    bool getState() {
+    void setPin(int pin) {
+      buttonPin = pin;
       pinMode(buttonPin, INPUT);
+    }
+
+    bool getState() {
       return digitalRead(buttonPin);
     }
 
     void onPress(void (*f)()) {
       onPressHandler = f;
+    }
+
+    void reset() {
+      wasButtonPressed = false;
     }
 
     int timeOfLastChange = 0;

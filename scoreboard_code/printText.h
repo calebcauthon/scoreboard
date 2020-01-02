@@ -10,7 +10,7 @@
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
 #define MAX_DEVICES 4
 
-#define CLK_PIN   13  // or SCK
+#define CLK_PIN   12  // or SCK
 #define DATA_PIN  10  // or MOSI
 #define CS_PIN    11  // or SS
 

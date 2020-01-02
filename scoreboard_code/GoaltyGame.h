@@ -9,6 +9,16 @@ public:
     onGameOverHandler = f;
   }
 
+  void (*onScoreIncreaseHandler)(void);
+  void onScoreIncrease(void (*f)()) {
+    onScoreIncreaseHandler = f;
+  }
+
+  void reset() {
+    leftScore = 0;
+    rightScore = 0;
+  }
+
   bool isGameOver() {
     int higherScore = leftScore > rightScore ? leftScore : rightScore;
     int lowerScore  = leftScore > rightScore ? rightScore : leftScore;
@@ -33,6 +43,10 @@ public:
 
     leftScore += amount;
 
+    if (amount > 0) {
+      onScoreIncreaseHandler();
+    }
+
     if (isGameOver()) {
       onGameOverHandler();
     }
@@ -48,6 +62,10 @@ public:
     }
 
     rightScore += amount;
+
+    if (amount > 0) {
+      onScoreIncreaseHandler();
+    }
 
     if (isGameOver()) {
       onGameOverHandler();

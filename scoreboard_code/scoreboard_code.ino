@@ -11,31 +11,24 @@
 #include "GoaltyGame.h"
 #include "ButtonState.h"
 #include "printText.h"
+#include "playSounds.h"
 
 char message[BUF_SIZE] = "Hello!";
 bool newMessageAvailable = true;
 
 const int buttonPinLeft = 2;
 const int buttonPinRight = 3;
+int timeOfReset = 0;
 
 ButtonState leftUpButton;
 ButtonState leftDownButton;
 ButtonState rightUpButton;
 ButtonState rightDownButton;
+ButtonState onOffButton;
 GoaltyGame game;
-
-void playUpSound() {
-  Serial.println("Sound!");
-  // tone(8, NOTE_C4, 1000 / 4);
-  // delay(100);
-  // tone(8, NOTE_C5, 1000 / 4);
-  // delay(100);
-  // noTone(8);
-}
 
 void increaseLeftScore() {
   game.increaseLeft();
-  playUpSound();
   displayCurrentScore();
 }
 
@@ -55,7 +48,7 @@ void decreaseRightScore() {
 }
 
 void displayCurrentScore() {
-  displayStringOnDisplay(String(game.leftScore) + "-" + String(game.rightScore));
+  displayStringOnDisplay("  " + String(game.leftScore) + " - " + String(game.rightScore));
 }
 
 void displayStringOnDisplay(String text) {
@@ -64,36 +57,75 @@ void displayStringOnDisplay(String text) {
   printText(0, MAX_DEVICES-1, scoreMessage);
 }
 
+bool endGameLoop = false;
 void loop()
 {
-  leftUpButton.buttonPin = 2;
-  leftUpButton.onPress(increaseLeftScore);
+
+  if (endGameLoop) {
+    playEndGameSound();
+    endGameLoop = false;
+  }
+
+  if (millis() > timeOfReset && timeOfReset > 0) {
+    Serial.println("RESET COMPLETE");
+    timeOfReset = 0;
+  } else if (timeOfReset > 0) {
+    Serial.println("bail because of the reset");
+    return;
+  }
+
+  onOffButton.tick();
+  rightDownButton.tick();
+  rightUpButton.tick();
+  leftDownButton.tick();
   leftUpButton.tick();
 
-  leftDownButton.buttonPin = 5;
-  leftDownButton.onPress(decreaseLeftScore);
-  leftDownButton.tick();
+  // Serial.println(String(digitalRead(2)) + " " + String(digitalRead(3)) + " " + String(digitalRead(4)) + " " + String(digitalRead(5)));
+  if (leftUpButton.wasButtonPressed && rightUpButton.wasButtonPressed) {
+    resetGame();
+  }
 
-  rightUpButton.buttonPin = 4;
-  rightUpButton.onPress(increaseRightScore);
-  rightUpButton.tick();
-
-  rightDownButton.buttonPin = 3;
-  rightDownButton.onPress(decreaseRightScore);
-  rightDownButton.tick();
+  delay(25);
 }
 
 void onGameOver() {
-  Serial.print("Game over!");
+  endGameLoop = true;
+}
+
+void resetGame() {
+  game.reset();
+  displayCurrentScore();
+
+  timeOfReset = millis() + 2000;
+
+  rightDownButton.reset();
+  rightUpButton.reset();
+  leftDownButton.reset();
+  leftUpButton.reset();
+
+  Serial.println("RESET START");
 }
 
 void setup()
 {
   mx.begin();
 
-  char scoreMessage[BUF_SIZE] = "0-0";
+  char scoreMessage[BUF_SIZE] = "  0 - 0";
   printText(0, MAX_DEVICES-1, scoreMessage);
   Serial.begin(9600);
 
   game.onGameOver(onGameOver);
+  game.onScoreIncrease(playUpSound);
+
+  leftUpButton.setPin(2);
+  leftUpButton.onPress(increaseLeftScore);
+
+  leftDownButton.setPin(3);
+  leftDownButton.onPress(decreaseLeftScore);
+
+  rightDownButton.setPin(4);
+  rightDownButton.onPress(decreaseRightScore);
+
+  rightUpButton.setPin(5);
+  rightUpButton.onPress(increaseRightScore);
 }
