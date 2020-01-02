@@ -24,7 +24,6 @@ ButtonState leftUpButton;
 ButtonState leftDownButton;
 ButtonState rightUpButton;
 ButtonState rightDownButton;
-ButtonState onOffButton;
 GoaltyGame game;
 
 void increaseLeftScore() {
@@ -74,7 +73,6 @@ void loop()
     return;
   }
 
-  onOffButton.tick();
   rightDownButton.tick();
   rightUpButton.tick();
   leftDownButton.tick();
@@ -118,14 +116,18 @@ void setup()
   game.onScoreIncrease(playUpSound);
 
   leftUpButton.setPin(2);
+  leftUpButton.id = "left up";
   leftUpButton.onPress(increaseLeftScore);
 
   leftDownButton.setPin(3);
+  leftDownButton.id = "left down";
   leftDownButton.onPress(decreaseLeftScore);
 
   rightDownButton.setPin(4);
+  rightDownButton.id = "right down";
   rightDownButton.onPress(decreaseRightScore);
 
   rightUpButton.setPin(5);
+  rightUpButton.id = "right up";
   rightUpButton.onPress(increaseRightScore);
 }

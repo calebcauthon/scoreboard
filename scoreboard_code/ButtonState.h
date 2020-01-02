@@ -22,8 +22,8 @@ class ButtonState {
       wasButtonPressed = false;
     }
 
-    int timeOfLastChange = 0;
-    int timeSinceLastChange() {
+    unsigned long timeOfLastChange = 0;
+    unsigned long timeSinceLastChange() {
       return millis() - timeOfLastChange;
     }
 
